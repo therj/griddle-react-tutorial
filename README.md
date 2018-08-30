@@ -1,1 +1,1 @@
-"# griddle-react-tutorial" 
+# griddle-react-tutorial
