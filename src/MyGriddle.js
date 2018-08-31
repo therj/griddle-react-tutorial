@@ -1,16 +1,13 @@
 import React, { Component } from 'react'
-import Griddle from 'griddle-react'
+import Griddle, { plugins } from 'griddle-react'
 import fakeData from './MOCK_DATA'
 
 const fakeLoadDataFromAPI = (currentPage, pageSize, callback) => {
   // setTimeout(() => {
-    callback({
-      data: fakeData.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize,
-      ),
-      currentPage,
-    })
+  callback({
+    data: fakeData.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    currentPage,
+  })
   // }, 100)
 }
 class MyGriddle extends Component {
@@ -21,28 +18,29 @@ class MyGriddle extends Component {
       currentPage: 1,
       pageSize: 5,
       recordCount: fakeData.length,
+      // recordCount: 20,
     }
   }
   render() {
     const { data, currentPage, pageSize, recordCount } = this.state
-    // const { data } = this.state
+
     return (
       <div>
         <Griddle
+        //  Enabling this plugin enables filter, but disables pagination!
+          plugins={[plugins.LocalPlugin]}
+
           data={data}
-          pageProperties={{
-            currentPage,
-            pageSize,
-            recordCount,
-          }}
+          pageProperties={{ data, currentPage, pageSize, recordCount }}
           events={{
             onNext: this._onNext,
             onPrevious: this._onPrevious,
             onGetPage: this._onGetPage,
           }}
           components={{
-            Filter: () => <span />,
-            SettingsToggle: () => <span />
+            // Filter: () => <span />,
+            // hide settings toggle button
+            SettingsToggle: () => <span />,
           }}
           styleConfig={{
             icons: {
@@ -77,23 +75,23 @@ class MyGriddle extends Component {
       </div>
     )
   }
-    updateTableState = ({ data, currentPage }) => {
-      this.setState({ data, currentPage });
-    }
-
-    _onNext = () => {
-      const { currentPage, pageSize } = this.state;
-      fakeLoadDataFromAPI(currentPage + 1, pageSize, this.updateTableState);
-    }
-
-    _onPrevious = () => {
-      const { currentPage, pageSize } = this.state;
-      fakeLoadDataFromAPI(currentPage - 1, pageSize, this.updateTableState);
-    }
-    _onGetPage = (pageNumber) => {
-      const { pageSize } = this.state;
-      fakeLoadDataFromAPI(pageNumber, pageSize, this.updateTableState);
-    }
+  updateTableState = ({ data, currentPage }) => {
+    this.setState({ data, currentPage })
   }
+
+  _onNext = () => {
+    const { currentPage, pageSize } = this.state
+    fakeLoadDataFromAPI(currentPage + 1, pageSize, this.updateTableState)
+  }
+
+  _onPrevious = () => {
+    const { currentPage, pageSize } = this.state
+    fakeLoadDataFromAPI(currentPage - 1, pageSize, this.updateTableState)
+  }
+  _onGetPage = (pageNumber) => {
+    const { pageSize } = this.state
+    fakeLoadDataFromAPI(pageNumber, pageSize, this.updateTableState)
+  }
+}
 
 export default MyGriddle
